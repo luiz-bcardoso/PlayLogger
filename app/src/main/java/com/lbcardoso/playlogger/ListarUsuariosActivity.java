@@ -22,6 +22,7 @@ import androidx.room.Room;
 import com.lbcardoso.playlogger.User.User;
 import com.lbcardoso.playlogger.User.UserDAO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,11 +78,37 @@ public class ListarUsuariosActivity extends AppCompatActivity {
     }
 
     public void excluir(MenuItem item){
-
+        //pegar qual a posicao do item da lista que eu selecionei para excluir
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)
+                item.getMenuInfo();
+        final User usuarioExcluir = usuariosFiltrados.get(menuInfo.position);
+        //mensagem perguntando se quer realmente excluir
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Atenção")
+                .setMessage("Realmente deseja excluir este usuário?")
+                .setNegativeButton("NÃO",null)
+                .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        usuariosFiltrados.remove(usuarioExcluir);
+                        usuarios.remove(usuarioExcluir);
+                        userDAO.excluir(usuarioExcluir);
+                        listView.invalidateViews();
+                    }
+                } ).create(); //criar a janela
+        dialog.show(); //manda mostrar a janela
     }
 
     public void atualizar(MenuItem item){
-        
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final User usuarioUpdate = usuariosFiltrados.get(menuInfo.position);
+
+        //Ao selecionar atualizar, abrir a janela de cadastro e enviar esse aluno para lá
+        Intent it = new Intent(this, MainActivity.class);
+
+        //será preenchido com os dados do aluno que quer atualizar, podemos alterar e salvar
+        it.putExtra("user", (Serializable) usuarioUpdate);
+        startActivity(it);
     }
 
     public void voltarDashboard(View view) {
