@@ -34,7 +34,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
-        android:id="@+id/listView"
+        android:id="@+id/listView_jogos"
         android:layout_width="392dp"
         android:layout_height="479dp"
         android:layout_marginStart="8dp"
