@@ -14,4 +14,6 @@ import com.lbcardoso.playlogger.User.UserDAO;
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDAO usuarioDao();
     public abstract JogoDAO jogoDao();
+
+
 }

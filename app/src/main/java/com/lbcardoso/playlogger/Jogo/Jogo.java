@@ -2,12 +2,29 @@ package com.lbcardoso.playlogger.Jogo;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "jogos")
-public class Jogo {
+import com.lbcardoso.playlogger.User.User;
+
+import java.io.Serializable;
+
+
+
+@Entity(tableName = "jogos"/*,
+        foreignKeys = @ForeignKey(
+        entity = User.class,
+        parentColumns = "id",
+        childColumns = "id_jogador",
+        onDelete = ForeignKey.CASCADE
+)*/)
+public class Jogo implements Serializable {
+
     @PrimaryKey(autoGenerate = true)
     private int id;
+
+    /*@ColumnInfo(name="id_jogador")
+    private int id_jogador;*/
 
     @ColumnInfo(name = "nome")
     private String nome;
@@ -28,7 +45,15 @@ public class Jogo {
     public void setId(int id) {
         this.id = id;
     }
+/*
+    public int getId_jogador() {
+        return id_jogador;
+    }
 
+    public void setId_jogador(int id_jogador) {
+        this.id_jogador = id_jogador;
+    }
+*/
     public String getNome() {
         return nome;
     }
@@ -63,12 +88,8 @@ public class Jogo {
 
     @Override
     public String toString() {
-        return "Jogo{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", empresa='" + empresa + '\'' +
-                ", plataforma='" + plataforma + '\'' +
-                ", data='" + data + '\'' +
-                '}';
+        return  "[J]: "+nome+" | " +
+                "[E]: "+empresa+" | " +
+                "[P]: "+plataforma;
     }
 }

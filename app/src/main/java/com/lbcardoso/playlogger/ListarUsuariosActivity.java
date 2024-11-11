@@ -42,6 +42,7 @@ public class ListarUsuariosActivity extends AppCompatActivity {
         // Inicializar o banco de dados Room
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "banco-de-dados")
+                .fallbackToDestructiveMigration()
                 .allowMainThreadQueries() //Bad for production
                 .build();
 
@@ -103,11 +104,11 @@ public class ListarUsuariosActivity extends AppCompatActivity {
         AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         final User usuarioUpdate = usuariosFiltrados.get(menuInfo.position);
 
-        //Ao selecionar atualizar, abrir a janela de cadastro e enviar esse aluno para lá
+        //Ao selecionar atualizar, abrir a janela de cadastro e enviar esse jogo para lá
         Intent it = new Intent(this, MainActivity.class);
 
-        //será preenchido com os dados do aluno que quer atualizar, podemos alterar e salvar
-        it.putExtra("user", (Serializable) usuarioUpdate);
+        //será preenchido com os dados que quer atualizar, podemos alterar e salvar
+        it.putExtra("user", usuarioUpdate);
         startActivity(it);
     }
 

@@ -42,11 +42,22 @@ public class CadastrarJogoActivity extends AppCompatActivity {
         // Inicializar o banco de dados Room
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "banco-de-dados")
+                .fallbackToDestructiveMigration() // Permite migração com deleção
                 .allowMainThreadQueries() //Bad for production
                 .build();
 
         // Obter instâncias dos DAOs
         jogoDAO = db.jogoDao();
+
+        //(Editar) PEGAR OS DADOS QUE VEM NO INTENT DO ATUALIZAR
+        Intent it = getIntent(); //pega intenção
+        if(it.hasExtra("jogo")) {
+            jogo = (Jogo) it.getSerializableExtra("jogo");
+            nome.setText(jogo.getNome());
+            plataforma.setText(jogo.getPlataforma());
+            empresa.setText(jogo.getEmpresa());
+            data.setText(jogo.getData());
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -55,13 +66,12 @@ public class CadastrarJogoActivity extends AppCompatActivity {
         });
     }
 
-
     public void cadastrarJogo(View view) {
         Intent intent = new Intent(this, DashboardUserActivity.class);
-        jogo = new Jogo();
 
         if (jogo == null) {
             //Cadastro de novo jogo
+            jogo = new Jogo();
             jogo.setNome(nome.getText().toString());
             jogo.setPlataforma(plataforma.getText().toString());
             jogo.setEmpresa(empresa.getText().toString());
@@ -70,8 +80,14 @@ public class CadastrarJogoActivity extends AppCompatActivity {
             jogoDAO.inserir(jogo);
             Toast.makeText(this,"Jogo cadastrado com sucesso!", Toast.LENGTH_SHORT).show();
         }else{
-            //RECEBENDO DADOS DO ATUALIZAR NA VARIAVEL 'user'
-            //TODO: Update
+            //RECEBENDO DADOS DO ATUALIZAR NA VARIAVEL 'jogo'
+            jogo.setNome(nome.getText().toString());
+            jogo.setPlataforma(plataforma.getText().toString());
+            jogo.setEmpresa(empresa.getText().toString());
+            jogo.setData(data.getText().toString());
+
+            jogoDAO.atualizar(jogo); //inserir o aluno
+            Toast.makeText(this,"Jogo atualizado com sucesso!", Toast.LENGTH_SHORT).show();
         }
         startActivity(intent);
     }

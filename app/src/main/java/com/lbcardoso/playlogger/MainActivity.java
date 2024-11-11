@@ -26,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private User usuario = null;
 
+    public AppDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +39,9 @@ public class MainActivity extends AppCompatActivity {
         email = findViewById(R.id.editText_email);
 
         // Inicializar o banco de dados Room
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+        db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "banco-de-dados")
+                        .fallbackToDestructiveMigration() // Permite migração com deleção
                         .allowMainThreadQueries() //Bad for production
                         .build();
 
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void consultarUsuario(View view) {
         Intent intent = new Intent(this, DashboardUserActivity.class);
-
 
         if(usuario == null){
             usuario = new User();

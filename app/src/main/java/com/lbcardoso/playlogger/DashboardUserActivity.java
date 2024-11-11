@@ -1,8 +1,14 @@
 package com.lbcardoso.playlogger;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,16 +25,14 @@ import com.lbcardoso.playlogger.Jogo.JogoDAO;
 import com.lbcardoso.playlogger.User.User;
 import com.lbcardoso.playlogger.User.UserDAO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DashboardUserActivity extends AppCompatActivity {
-
     private TextView nome;
     private ListView listView;
-
     private JogoDAO jogoDAO;
-
     private List<Jogo> jogos;
     private List<Jogo> jogosFiltrados = new ArrayList<>();
 
@@ -47,6 +51,7 @@ public class DashboardUserActivity extends AppCompatActivity {
         // Inicializar o banco de dados Room
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                         AppDatabase.class, "banco-de-dados")
+                .fallbackToDestructiveMigration() // Permite migração com deleção
                 .allowMainThreadQueries() //Bad for production
                 .build();
 
@@ -76,9 +81,51 @@ public class DashboardUserActivity extends AppCompatActivity {
         });
     }
 
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater i = getMenuInflater();
+        i.inflate(R.menu.menu_contexto, menu);
+    }
+
+    public void excluir(MenuItem item){
+        //pegar qual a posicao do item da lista que eu selecionei para excluir
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)
+                item.getMenuInfo();
+        final Jogo jogoExcluir = jogosFiltrados.get(menuInfo.position);
+        //mensagem perguntando se quer realmente excluir
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Atenção")
+                .setMessage("Realmente deseja excluir este usuário?")
+                .setNegativeButton("NÃO",null)
+                .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        jogosFiltrados.remove(jogoExcluir);
+                        jogos.remove(jogoExcluir);
+                        jogoDAO.excluir(jogoExcluir);
+                        listView.invalidateViews();
+                    }
+                } ).create(); //criar a janela
+        dialog.show(); //manda mostrar a janela
+    }
+
+    public void atualizar(MenuItem item){
+        AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final Jogo jogoUpdate = jogosFiltrados.get(menuInfo.position);
+
+        Intent it = new Intent(this, CadastrarJogoActivity.class);
+
+        it.putExtra("jogo", jogoUpdate);
+        startActivity(it);
+    }
 
     public void listarUsuarios(View view) {
         Intent intent = new Intent(this, ListarUsuariosActivity.class);
+        startActivity(intent);
+    }
+
+    public void cadastrarJogo(View view) {
+        Intent intent = new Intent(this, CadastrarJogoActivity.class);
         startActivity(intent);
     }
 }
